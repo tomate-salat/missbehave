@@ -1,0 +1,62 @@
+using System;
+using System.Collections.Generic;
+using Godot;
+
+namespace Missbehave;
+
+/// <summary>How a list works through its entries.</summary>
+public enum ListMode {
+    /// <summary>Front to back until one fails; succeeds when all succeed.</summary>
+    Sequence,
+
+    /// <summary>Front to back until one succeeds; fails when all fail.</summary>
+    Selector,
+}
+
+/// <summary>
+/// Several leaves of one kind folded into a single box: the graph draws the entries as rows inside
+/// the list instead of as boxes of their own. Underneath they are ordinary children, so they tick,
+/// clone, save and report to the debugger exactly like the children of a sequence or selector.
+/// </summary>
+[GlobalClass, Tool]
+public abstract partial class AListNode : ACompositeNode {
+    [Export]
+    public ListMode Mode { get; set; } = ListMode.Sequence;
+
+    /// <summary>The kind of leaf this list holds.</summary>
+    public abstract Type EntryType { get; }
+
+    public bool Accepts(ABehaviorNode node) => node != null && EntryType.IsInstanceOfType(node);
+
+    protected override BehaviorStatus Tick(BtContext ctx) {
+        // The entry that ends the run: a failure for a sequence, a success for a selector.
+        var decisive = Mode == ListMode.Sequence ? BehaviorStatus.Failure : BehaviorStatus.Success;
+        var start = RunningChild < 0 ? 0 : RunningChild;
+
+        for (var i = start; i < Children.Count; i++) {
+            var status = TickChild(i, ctx);
+
+            if (status == BehaviorStatus.Running) {
+                RunningChild = i;
+                return BehaviorStatus.Running;
+            }
+            if (status == decisive) {
+                RunningChild = -1;
+                return decisive;
+            }
+        }
+
+        RunningChild = -1;
+        return Mode == ListMode.Sequence ? BehaviorStatus.Success : BehaviorStatus.Failure;
+    }
+
+    public override string[] GetConfigurationWarnings() {
+        var warnings = new List<string>(base.GetConfigurationWarnings());
+        for (var i = 0; i < Children.Count; i++) {
+            if (Children[i] != null && !Accepts(Children[i])) {
+                warnings.Add($"entry #{i + 1} ({Children[i].GetLabel()}) is not a {EntryType.Name}");
+            }
+        }
+        return [.. warnings];
+    }
+}

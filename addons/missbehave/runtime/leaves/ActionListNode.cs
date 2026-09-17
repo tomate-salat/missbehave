@@ -1,0 +1,13 @@
+using System;
+using Godot;
+
+namespace Missbehave;
+
+/// <summary>
+/// Several actions run top to bottom inside one box — as a sequence (until one fails) or a selector
+/// (until one succeeds). An action that is still running is resumed on the next tick.
+/// </summary>
+[GlobalClass, Tool, Icon("res://addons/missbehave/icons/action_list.svg")]
+public partial class ActionListNode : AListNode {
+    public override Type EntryType => typeof(ActionNode);
+}

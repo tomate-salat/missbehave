@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://c5qutjfutpmww"]
+
+[ext_resource type="Resource" uid="uid://codmii44vqrll" path="res://demo/demo_tree.tres" id="1_tree"]
+[ext_resource type="Script" uid="uid://x3sa82m2eckj" path="res://addons/missbehave/runtime/BehaviorTreeRunner.cs" id="2_runner"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+size = Vector2(40, 40)
+
+[sub_resource type="StandardMaterial3D" id="Mat_ground"]
+albedo_color = Color(0.16, 0.17, 0.2, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_actor"]
+size = Vector3(1.5, 1.5, 1.5)
+
+[sub_resource type="StandardMaterial3D" id="Mat_player"]
+albedo_color = Color(0.29, 0.66, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_enemy"]
+albedo_color = Color(1, 0.42, 0.31, 1)
+
+[node name="Demo" type="Node3D" unique_id=62515991]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1763082829]
+transform = Transform3D(1, 0, 0, 0, 0.521449, 0.85328245, 0, -0.85328245, 0.521449, 0, 8.740187, 9.197798)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1006027205]
+transform = Transform3D(1, 0, 0, 0, 0.5, -0.866, 0, 0.866, 0.5, 0, 10, 0)
+shadow_enabled = true
+
+[node name="Ground" type="MeshInstance3D" parent="." unique_id=1690276668]
+mesh = SubResource("PlaneMesh_ground")
+surface_material_override/0 = SubResource("Mat_ground")
+
+[node name="Player" type="Node3D" parent="." unique_id=739094755 groups=["player"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Player" unique_id=1568621270]
+mesh = SubResource("BoxMesh_actor")
+surface_material_override/0 = SubResource("Mat_player")
+
+[node name="EnemyNear" type="Node3D" parent="." unique_id=718704902]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.75, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="EnemyNear" unique_id=233672972]
+mesh = SubResource("BoxMesh_actor")
+surface_material_override/0 = SubResource("Mat_enemy")
+
+[node name="BehaviorTreeRunner" type="Node" parent="EnemyNear" unique_id=129237524]
+script = ExtResource("2_runner")
+Tree = ExtResource("1_tree")
+
+[node name="EnemyFar" type="Node3D" parent="." unique_id=1950140233]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.75, 5)
+
+[node name="Mesh" type="MeshInstance3D" parent="EnemyFar" unique_id=2087138681]
+mesh = SubResource("BoxMesh_actor")
+surface_material_override/0 = SubResource("Mat_enemy")
+
+[node name="BehaviorTreeRunner" type="Node" parent="EnemyFar" unique_id=1202237561]
+script = ExtResource("2_runner")
+Tree = ExtResource("1_tree")

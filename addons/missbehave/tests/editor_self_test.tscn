@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/missbehave/tests/BtEditorSelfTest.cs" id="1_editortest"]
+
+[node name="BtEditorSelfTest" type="Node"]
+script = ExtResource("1_editortest")
